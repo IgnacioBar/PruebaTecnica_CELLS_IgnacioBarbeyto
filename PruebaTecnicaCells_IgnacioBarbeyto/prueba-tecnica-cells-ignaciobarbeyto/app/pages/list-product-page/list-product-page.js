@@ -22,47 +22,7 @@ import '@cells-demo/demo-web-template/demo-web-template.js';
 import '@cells-demo/demo-table-movements/demo-table-movements.js';
 import styles from './list-product-page-styles.js';
 
-const iconset = {
-  copy: bbvaCopy(),
-  edit: bbvaEdit()
-};
-
-const HEADER_ICONS = [{
-  icon: bbvaHelp(),
-  label: 'Help'
-}, {
-  icon: bbvaTasks(),
-  label: 'Task'
-}, {
-  icon: bbvaEmail(),
-  label: 'Email',
-  notifications: 0
-}, {
-  icon: bbvaBuilding(),
-  label: 'Building'
-}, {
-  icon: bbvaFeedback(),
-  label: 'Feedback'
-}];
-
 const DEFAULT_I18N_KEYS = {
-  accountDetail: 'dashboard-page.account-detail',
-  accountMovements: 'dashboard-page.account-movements',
-  accountNumber: 'dashboard-page.account-number',
-  accountType: 'dashboard-page.account-type',
-  alias: 'dashboard-page.alias',
-  allowableLimit: 'dashboard-page.allowable-limit',
-  arranged: 'dashboard-page.arranged',
-  arrangedAllowableLimit: 'dashboard-page.arranged-allowable-limit',
-  availableBalance: 'dashboard-page.available-balance',
-  businessName: 'dashboard-page.business-name',
-  copyAccountNumber: 'dashboard-page.copy-account-number',
-  currency: 'dashboard-page.currency',
-  difference: 'dashboard-page.difference',
-  editAlias: 'dashboard-page.edit-alias',
-  entity: 'dashboard-page.entity',
-  selectAccount: 'dashboard-page.select-account',
-  totalAccountBalance: 'dashboard-page.total-account-balance',
 };
 
 /* eslint-disable new-cap */
