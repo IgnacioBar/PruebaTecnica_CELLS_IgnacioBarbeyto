@@ -1,0 +1,82 @@
+@use "node_modules/@bbva-web-components/bbva-foundations-sass/main" as *;
+
+:host {
+  --bbva-web-progress-bar-bg-color: #{token('foundations.colors.secondary300')};
+
+  display: block;
+  box-sizing: border-box;
+  font-size: token('foundations.typography.typeSmall');
+  line-height: token('foundations.lineHeight.typeSmall');
+}
+
+:host([hidden]),
+[hidden] {
+  display: none !important;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+.hidden {
+  border: 0px;
+  clip: rect(0px, 0px, 0px, 0px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 1px;
+  text-decoration: none;
+}
+
+form {
+  width: 40%;
+  margin: 3rem auto 1rem;
+
+  & > * {
+    margin-bottom: 1rem;
+  }
+
+  bbva-web-form-fieldset {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+
+  bbva-web-form-text {
+    box-sizing: border-box;
+  }
+
+  h3 {
+    font-weight: token('foundations.fontFacePrimary.medium.fontWeight');
+  }
+}
+
+.opportunity {
+  margin: 5rem 0 3rem;
+
+  &-header {
+   text-align: center;
+   margin-bottom: 3rem;
+
+    h3 {
+      margin: 0 0 .5rem;
+      font-size: token('foundations.typography.type4XLarge');
+      line-height: token('foundations.lineHeight.type4XLarge');
+      font-weight: token('foundations.fontFacePrimary.book.fontWeight');
+    }
+
+    p {
+      margin: 0 0 1rem;
+    }
+  }
+}
+
+bbva-web-module-footer-language-list-item[selected] {
+  font-weight: token('foundations.fontFacePrimary.medium.fontWeight');
+}
