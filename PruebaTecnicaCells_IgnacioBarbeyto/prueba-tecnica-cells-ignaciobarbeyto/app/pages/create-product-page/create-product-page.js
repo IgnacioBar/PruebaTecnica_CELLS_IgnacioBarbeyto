@@ -95,7 +95,7 @@ class CreateProductPage extends BbvaCoreIntlMixin(CellsPage) {
 
         </div>
 
-        <demo-data-dm @settings="${this._getUserSettings}"></demo-data-dm>
+        <demo-data-dm></demo-data-dm>
       </demo-web-template>
     `;
   }
