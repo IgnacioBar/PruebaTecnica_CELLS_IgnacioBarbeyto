@@ -46,6 +46,7 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
   constructor() {
     super();
     this.i18nKeys = {};
+    this._products = [];
   }
 
   connectedCallback() {
@@ -104,13 +105,16 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
     return html`
     ${this._products.map((product, index) => html`
       <bbva-web-card-product
-      badge-text="Producto ${(index + 1)}"
-      launch-text="Nombre: ${(product.nameP)}"
-      preheading="Precio: ${(product.amountP)} €"> 
+        badge-text="Producto ${(index + 1)}"
+        launch-text="Nombre: ${product.nameP}"
+        preheading="Precio: ${product.amountP} €"
+        button-text="Borrar Producto"
+        @button-click="${() => this._deleteProduct(index)}">
       </bbva-web-card-product>
     `)}
   `;
   }
+
 
   _handleAddProduct() {
     const { nameP, amountP/*, imageP*/} = this._product;
@@ -122,6 +126,19 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
       existingProducts.push(newProduct);
       localStorage.setItem('productos', JSON.stringify(existingProducts));
     }
+  }
+
+  _deleteProduct(index) {
+    const products = JSON.parse(localStorage.getItem('productos')) || [];
+
+    // Eliminamos el producto en el índice dado
+    products.splice(index, 1);
+
+    // Guardamos la lista actualizada en localStorage
+    localStorage.setItem('productos', JSON.stringify(products));
+
+    // Recargar la página o actualizar la vista para reflejar los cambios
+    this.requestUpdate();
   }
 
 }
