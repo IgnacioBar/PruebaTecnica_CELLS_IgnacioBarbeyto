@@ -19,6 +19,8 @@ import '@cells-demo/demo-web-template/demo-web-template.js';
 import '@bbva-web-components/bbva-web-form-amount/bbva-web-form-amount.js';
 import styles from './create-product-page-styles.js';
 
+// Nombres más descriptivos como create-product-image-input
+// Evitemos mezclar guiones con puntos, normalmente nombres separados con guiones
 const DEFAULT_I18N_KEYS = {
   formHeading: 'create-product-page.form-heading',
   labelInput1: 'create-product-page.form-input-1-label',
@@ -46,13 +48,23 @@ class CreateProductPage extends BbvaCoreIntlMixin(CellsPage) {
       product: {
         type: Object,
         attribute: false,
+      },
+      productList: {
+        type: Array,
       }
     };
   }
 
   constructor() {
     super();
-    this.product = {};
+    this.product = {
+      nameP: '',
+      amountP: '',
+      imageP: '',
+    };
+
+    this.productList = [];
+
     this.i18nKeys = {};
   }
 
@@ -60,12 +72,14 @@ class CreateProductPage extends BbvaCoreIntlMixin(CellsPage) {
     return [ styles ];
   }
 
+  // Podemos eliminar código que no utilizamos
   firstUpdated(props) {
     super.firstUpdated && super.firstUpdated(props);
 
     const queryScope = this.shadowRoot || this;
-    this._dm = queryScope.querySelector('demo-data-dm');
-    this._form = queryScope.querySelector('form');
+
+    //this._dm = queryScope.querySelector('demo-data-dm');
+    //this._form = queryScope.querySelector('form');
     window.IntlMsg.lang = localStorage.getItem('language') || 'en-US';
   }
 
@@ -94,22 +108,22 @@ class CreateProductPage extends BbvaCoreIntlMixin(CellsPage) {
         <div slot="app-main-content" data-grid="full-width">
 
         </div>
-
-        <demo-data-dm></demo-data-dm>
       </demo-web-template>
     `;
   }
 
 
+  // Recuerda poner siempre el attribute name para cada input
+  // 😔 nos falta el imput para añadir imagen
+  // para tener reactividad en los valores de los inputs, utilizamos la propiedad this.product
   get _formProductTpl() {
     return html`
         <form enctype="multipart/form-data">
 
           <h2>${this.t(this._i18nKeys.formHeading)}</h2>
-          <bbva-web-form-text id="name" label="${this.t(this._i18nKeys.labelInput1)}"></bbva-web-form-text>
-          <bbva-web-form-amount id="amount" label="${this.t(this._i18nKeys.labelInput2)}"></bbva-web-form-amount>
-          <!--<bbva-core-image id="image" label="${this.t(this._i18nKeys.labelInput3)}"></bbva-core-image>-->
-          
+          <bbva-web-form-text value="${this.product.nameP}"  required name="name" label="${this.t(this._i18nKeys.labelInput1)}"></bbva-web-form-text>
+          <bbva-web-form-amount value="${this.product.amountP}" required name="amount" label="${this.t(this._i18nKeys.labelInput2)}"></bbva-web-form-amount> 
+          <bbva-web-form-text value="${this.product.imageP}"  required name="image" label="${this.t(this._i18nKeys.labelInput3)}"></bbva-web-form-text> 
           <bbva-web-button-default
             id="send"
             type="button" 
@@ -121,48 +135,81 @@ class CreateProductPage extends BbvaCoreIntlMixin(CellsPage) {
     `;
   }
 
+  // 💪 Muy bien, no vas mal encaminado, si añadimos el campo name en los inputs podemos utilizar New Formdata de Js nativo
+  // https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
   _addProduct(ev) {
     ev.preventDefault();
     ev.stopPropagation();
 
-    const form = document.querySelector('#cells-template-create-product').shadowRoot.querySelector('form');
+    //const form = document.querySelector('#cells-template-create-product').shadowRoot.querySelector('form');
+    // De esta manera guardamos el form padre del boton
+    const form = ev.target.closest('form');
 
     // Asegúrate de que el formulario existe
+    //  💪 Muy bien
     if (!form) {
       console.error('Formulario no encontrado');
       return;
     }
 
+    const formData = new FormData(form);
+
     // Valor del campo de entrada con name
-    const inputName = form.querySelector('#name');
-    const productName = inputName ? inputName.value : '';
+    //const inputName = form.querySelector('#name');
+    //const productName = inputName ? inputName.value : '';
 
     // Valor del campo de entrada con amount
-    const inputAmount = form.querySelector('#amount');
-    const productAmount = inputAmount ? inputAmount.value : '';
+    //const inputAmount = form.querySelector('#amount');
+    //const productAmount = inputAmount ? inputAmount.value : '';
 
     // Valor del campo de entrada con image
     //const inputImage = form.querySelector('#image');
     //const productImage = inputImage ? inputImage.value : '';
 
     // Asegúrate de que todos los valores necesarios están presentes
-    if (!productName || !productAmount /*|| !productImage*/) {
+    // Si pones los campos requeridos no hace falta comprobar que existen...
+
+    /*
+    if (!productName || !productAmount) {
       console.error('Todos los campos son obligatorios');
       return;
     }
+    */
 
-    const details = {
-      nameP: productName,
-      amountP: productAmount,
-
-      //imageP: productImage
+    // 😔 nos falta la imagen
+    this.product = {
+      nameP: formData.get('name'),
+      amountP: formData.get('amount'),
+      imageP: formData.get('image'),
     };
 
+    this.productList = [
+      ...this.productList,
+      this.product
+    ];
+
+    localStorage.setItem('productos', JSON.stringify(this.productList));
+
     // Publica el evento
-    this.publish('add_product', details);
+    // Recuerda que el nombre del canal siempre debería empezar por "channel-tu-canal"
+    this.publish('add_product', this.product);
+
+
+    // tenemos que borrar los inputs al navegar, de esta manera al volver a la pagina tengo los inputs borrados.
+    // para esto utilizamos this.product para guardar los valores de los inputs
+
+    this.product = {
+      nameP: '',
+      amountP: '',
+      imageP: '',
+    };
+    this.requestUpdate();
+
 
     // Navega a la página del listado
     this.navigate('list-product');
+
+
   }
 
 }

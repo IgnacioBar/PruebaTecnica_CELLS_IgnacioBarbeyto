@@ -7,10 +7,8 @@ import {
 /*
  * NOTE: "path" field has to be unique, if not it will use the 1st match
  */
+// Borramos ruta login
 export const NAVIGATION = [{
-  path: '/login',
-  page: 'login',
-},{
   path: '/',
   page: 'create-product',
 },

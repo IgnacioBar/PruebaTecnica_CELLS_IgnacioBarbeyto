@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
+// Borramos imports y componentes que no utilizamos
 import { CellsPage } from '@cells/cells-page';
 import { html } from 'lit-element';
-import { bbvaCopy, bbvaEdit, bbvaHelp, bbvaTasks, bbvaEmail, bbvaBuilding, bbvaFeedback } from '@bbva-web-components/bbva-foundations-icons';
 import { BbvaCoreIntlMixin } from '@bbva-web-components/bbva-core-intl-mixin';
 import '@bbva-web-components/bbva-foundations-grid-tools-layout/bbva-foundations-grid-tools-layout.js';
 import '@bbva-web-components/bbva-web-amount/bbva-web-amount.js';
@@ -26,6 +26,7 @@ const DEFAULT_I18N_KEYS = {
 };
 
 /* eslint-disable new-cap */
+// Borramos funciones que no utilizamos
 class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
   static get is() {
     return 'list-product-page';
@@ -40,6 +41,10 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
         type: Object,
         attribute: false,
       },
+
+      _products: {
+        type: Array,
+      }
     };
   }
 
@@ -47,18 +52,7 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
     super();
     this.i18nKeys = {};
     this._products = [];
-  }
-
-  connectedCallback() {
-    super.connectedCallback && super.connectedCallback();
-
-  }
-
-  firstUpdated(props) {
-    super.firstUpdated && super.firstUpdated(props);
-
-    const queryScope = this.shadowRoot || this;
-    this._dm = queryScope.querySelector('demo-data-dm');
+    this._product = {};
   }
 
   update(props) {
@@ -69,17 +63,24 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
     super.update && super.update(props);
   }
 
+  // Recuerda declarar la prop en constructor mínimo, si necesitamos que sea reactiva en properties
+  // Si utulizamos sessionStorage no haría falta pasar el producto por canal, pero es una buena practica
   onPageEnter() {
+    this._products = JSON.parse(localStorage.getItem('productos')) || [];
+
     this.subscribe('add_product', (ev) => {
       this._product = ev;
     });
-    this._handleAddProduct(this._product);
+
+    //this._handleAddProduct(this._product);
   }
 
   static get styles() {
     return [ styles ];
   }
 
+
+  // 😔 nos falta boto para ir hacia atrás
   render() {
     return html`
       <demo-web-template
@@ -100,8 +101,9 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
     `;
   }
 
+  // solo deberíamos recorrer la prop this.products
   _renderCardProduct() {
-    this._products = JSON.parse(localStorage.getItem('productos')) || [];
+    //this._products = JSON.parse(localStorage.getItem('productos')) || [];
     return html`
     ${this._products.map((product, index) => html`
       <bbva-web-card-product
@@ -116,26 +118,37 @@ class ListProductPage extends BbvaCoreIntlMixin(CellsPage) {
   }
 
 
+  // 💪 Muy bien, una función que se encarga de gestionar los productos
   _handleAddProduct() {
-    const { nameP, amountP/*, imageP*/} = this._product;
+    const { amountP, imageP, nameP } = this._product;
 
-    if (this._product) {
-      const existingProducts = JSON.parse(localStorage.getItem('productos')) || [];
-      const newProduct = { nameP, amountP/*, imageP*/};
+    //  Comprobamos mejor la desestructuración
+    if (nameP && amountP && imageP) {
 
-      existingProducts.push(newProduct);
-      localStorage.setItem('productos', JSON.stringify(existingProducts));
+      this._products = [
+        ...this._products,
+        {
+          nameP,
+          amountP,
+          imageP
+        }
+      ];
+
+      // Esto tendría sentido tenerlo en la pantalla de creación y no en el del listado, aquí solo deberíamos leer los items
+      //localStorage.setItem('productos', JSON.stringify(existingProducts));
     }
   }
 
-  _deleteProduct(index) {
-    const products = JSON.parse(localStorage.getItem('productos')) || [];
+  // 💪 Muy bien, tienes el eliminado del producto
+  _deleteProduct(indexDeleted) {
+    //const products = JSON.parse(localStorage.getItem('productos')) || [];
 
     // Eliminamos el producto en el índice dado
-    products.splice(index, 1);
+    // Para que lit se entere de la reactividad tenemos que cambiar de puntero la variable para esto necesitamos generar un nuevo array, podemos utilizar filter y nos ayudamos del operador spread
+    this._products = [ ...this._products.filter((product, index) => index !== indexDeleted) ];
 
     // Guardamos la lista actualizada en localStorage
-    localStorage.setItem('productos', JSON.stringify(products));
+    localStorage.setItem('productos', JSON.stringify(this._products));
 
     // Recargar la página o actualizar la vista para reflejar los cambios
     this.requestUpdate();
